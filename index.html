@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedSure Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Include Chart.js library -->
+    <style>
+        /* Basic styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        /* Navigation bar */
+        nav {
+            background-color: #0066cc;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 2rem;
+            align-items: center;
+        }
+
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        nav .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        nav .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        nav .nav-links a.active {
+            background-color: #004c99;
+        }
+
+        nav .profile {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        nav .profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+
+        /* Section styling */
+        section {
+            padding: 2rem;
+            display: none;
+        }
+
+        .card {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 250px;
+            height: 250px;
+            margin: 1rem;
+            text-align: center;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h3 {
+            margin: 0.5rem 0;
+            color: #0066cc;
+        }
+
+        .active-section {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* Dropdown and chart styling */
+        .dropdown-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .dropdown-container div {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        select {
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            min-width: 180px;
+            font-size: 1rem;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        .chart-title {
+            text-align: center;
+            font-size: 24px; /* Increase font size for prominence */
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .chart-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        canvas {
+            width: 90% !important; /* Adjusted width */
+            height: auto !important;
+            max-width: 450px; /* Decreased max-width from 500px to 450px */
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem 0;
+            background-color: #f1f1f1;
+        }
+
+        .adequacy-status {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        .download-btn {
+            display: block;
+            margin: 1rem auto 0;
+            padding: 0.75rem 1.5rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .download-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">MedSure</div>
+        <div class="nav-links">
+            <a onclick="showSection('dashboard', this)" class="active">Dashboard</a>
+            <a onclick="showSection('networkAdequacy', this)">Network Adequacy</a>
+            <a onclick="showSection('compliance', this)">Compliance</a>
+            <a onclick="showSection('support', this)">Support</a>
+        </div>
+        <div class="profile">
+            <span>Kush Khanna</span>
+            <img src="https://unichrone.com/blog/wp-content/uploads/Difference-between-a-Product-Manager-and-a-Product-Owner.png" alt="Profile Icon">
+        </div>
+    </nav>
+    <section id="dashboard" class="active-section">
+        <div class="card">
+            <h3>Network Adequacy Checks</h3>
+            <p>Ensures all required time and distance requirements are met for specialty coverage.</p>
+        </div>
+        <div class="card">
+            <h3>Automated HSD Table Creation</h3>
+            <p>Generates CMS-compliant structured HSD tables automatically.</p>
+        </div>
+        <div class="card">
+            <h3>Data Accuracy Validation</h3>
+            <p>Leverages MCheck™ technology for reliable data standardization and validation.</p>
+        </div>
+        <div class="card">
+            <h3>Risk Visualization</h3>
+            <p>Displays color-coded heatmaps to identify potential compliance risks by county and specialty.</p>
+        </div>
+        <div class="card">
+            <h3>Continuous Monitoring</h3>
+            <p>Uses web-scraping algorithms for real-time updates on regulatory changes and provider licenses.</p>
+        </div>
+    </section>
+   
+    <!-- Updated Network Adequacy Section -->
+<section id="networkAdequacy" class="hidden-section">
+<div class="dropdown-container">
+
+ <div class="chart-title">Network Adequacy Metrics</div>
+    
+        <div>
+            <label for="countySelect">County:</label>
+            <select id="countySelect" onchange="updateCharts()">
+                <option value="Los Angeles County">Los Angeles County</option>
+                <option value="Cook County">Cook County</option>
+                <option value="Harris County">Harris County</option>
+            </select>
+       
+            <label for="specialtySelect">Specialty:</label>
+            <select id="specialtySelect" onchange="updateCharts()">
+                <option value="Cardiology">Cardiology</option>
+                <option value="Oncology">Oncology</option>
+                <option value="Pediatrics">Pediatrics</option>
+            </select>
+       
+            <label for="providerSelect">Provider:</label>
+            <select id="providerSelect" onchange="updateCharts()">
+                <option value="Dr. Smith">Dr. Smith</option>
+                <option value="Dr. Johnson">Dr. Johnson</option>
+                <option value="Dr. Patel">Dr. Patel</option>
+            </select>
+        </div>
+    </div>
+    <div class="chart-container">
+        <div>
+            <h2 class="chart-title">Time and Distance Compliance</h2>
+            <canvas id="metric1Chart"></canvas>
+        </div>
+        <div>
+            <h2 class="chart-title">Minimum Provider Counts</h2>
+            <canvas id="metric2Chart"></canvas>
+        </div>
+        <div>
+            <h2 class="chart-title">Specialty Coverage Analysis</h2>
+            <canvas id="metric3Chart"></canvas>
+        </div>
+    </div>
+    <div class="adequacy-status" id="adequacyStatus"></div>
+    <button class="download-btn" id="downloadBtn" style="display:none;" onclick="showDownloadPopup()">Download HSD Table</button>
+</section>
+
+    <!-- Updated Compliance Section -->
+    <section id="compliance" class="hidden-section">
+        <div class="dropdown-container">
+<div class="chart-title">Compliance Checker</div>
+
+            <div>
+                <label for="complianceCountySelect">County:</label>
+                <select id="complianceCountySelect" onchange="updateComplianceCharts()">
+                    <option value="Los Angeles County">Los Angeles County</option>
+                    <option value="Cook County">Cook County</option>
+                    <option value="Harris County">Harris County</option>
+                </select>
+                <label for="complianceSpecialtySelect">Specialty:</label>
+                <select id="complianceSpecialtySelect" onchange="updateComplianceCharts()">
+                    <option value="Cardiology">Cardiology</option>
+                    <option value="Oncology">Oncology</option>
+                    <option value="Pediatrics">Pediatrics</option>
+                </select>
+                <label for="complianceProviderSelect">Provider:</label>
+                <select id="complianceProviderSelect" onchange="updateComplianceCharts()">
+                    <option value="Dr. Smith">Dr. Smith</option>
+                    <option value="Dr. Johnson">Dr. Johnson</option>
+                    <option value="Dr. Patel">Dr. Patel</option>
+                </select>
+            </div>
+        </div>
+        <div class="chart-container" style="grid-template-columns: 1fr 1fr; gap: 3rem;">
+            <div>
+                <h2 class="chart-title">Risk Heatmap</h2>
+                <canvas id="riskHeatmap"></canvas>
+            </div>
+            <div>
+                <h2 class="chart-title">County-Specialty Risk Scoring</h2>
+                <canvas id="riskScoringChart"></canvas>
+            </div>
+        </div>
+    </section>
+<section id="support" class="hidden-section" style="padding: 2rem; background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); max-width: 800px; margin: 2rem auto;">
+    <h2 style="text-align: center; color: #0066cc; margin-bottom: 1rem;">Support</h2>
+    <p style="text-align: justify; line-height: 1.6; margin-bottom: 1.5rem;">
+        Hi there, I'm <strong>Kush Khanna</strong>! Thank you for visiting this website. I created this MVP (Minimum Viable Product) as part of my application for the Product Manager role at HiLabs to demonstrate my ability to build and showcase a product from concept to implementation.
+    </p>
+    
+    <p style="text-align: justify; line-height: 1.6; margin-bottom: 1.5rem;">
+        <strong>Please note:</strong> This MVP is not intended for production use. The final product would be more advanced, with additional features and improvements for a seamless user experience.
+    </p>
+    
+    <p style="text-align: justify; line-height: 1.6; margin-bottom: 1.5rem;">
+        If you found this MVP helpful or have any suggestions for improvement, I would greatly appreciate your feedback. Your input will help me refine my approach and add value to future projects.
+    </p>
+    
+    <p style="text-align: center; margin-bottom: 2rem;">
+        You can provide your feedback through this <a href="https://docs.google.com/forms/d/1_ihvbCk05t9PhXRfuBoU2sqRu-3uvaTkwyOltlKQzus/edit" target="_blank" style="color: #0066cc; font-weight: bold;">Google Feedback Form</a>.
+    </p>
+    
+    <hr style="border: 1px solid #e0e0e0; margin-bottom: 2rem;">
+    
+    <div style="text-align: left;">
+        <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem;">Contact me:</p>
+        <ul style="list-style: none; padding: 0; display: inline-block; text-align: left;">
+            <li style="margin-bottom: 0.5rem;"><strong>Email:</strong> <a href="mailto:kush_khanna2025@isb.edu" style="color: #0066cc;">kush_khanna2025@isb.edu</a></li>
+            <li><strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/kushkhanna" target="_blank" style="color: #0066cc;">Connect with me on LinkedIn</a></li>
+        </ul>
+    </div>
+
+    <p style="text-align: center; margin-top: 2rem; font-style: italic;">Thank you for your support and for taking the time to explore my work!</p>
+</section>
+
+        <footer>
+        <p>© 2024 Kush Khanna. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Initialize charts using Chart.js
+        const metric1Chart = new Chart(document.getElementById('metric1Chart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Met', 'Unmet'],
+                datasets: [{
+                    data: [85, 15], // Example data for Time and Distance Compliance
+                    backgroundColor: ['#4CAF50', '#F44336']
+                }]
+            },
+            options: {
+                responsive: true,
+            }
+        });
+
+        const metric2Chart = new Chart(document.getElementById('metric2Chart'), {
+            type: 'bar',
+            data: {
+                labels: ['Min Provider Count'],
+                datasets: [{
+                    label: 'Count',
+                    data: [70], // Example data for Minimum Provider Counts
+                    backgroundColor: ['#2196F3']
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }]
+                }
+            }
+        });
+
+        const metric3Chart = new Chart(document.getElementById('metric3Chart'), {
+            type: 'radar',
+            data: {
+                labels: ['Cardiology', 'Oncology', 'Pediatrics'],
+                datasets: [{
+                    label: 'Coverage',
+                    data: [90, 75, 80], // Example data for Specialty Coverage Analysis
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)'
+                }]
+            },
+            options: {
+                responsive: true,
+            }
+        });
+
+        function showSection(sectionId, element) {
+            const sections = document.querySelectorAll('section');
+            sections.forEach(section => {
+                section.classList.remove('active-section');
+                section.classList.add('hidden-section');
+            });
+
+            const navLinks = document.querySelectorAll('.nav-links a');
+            navLinks.forEach(link => link.classList.remove('active'));
+
+            document.getElementById(sectionId).classList.add('active-section');
+            document.getElementById(sectionId).classList.remove('hidden-section');
+            element.classList.add('active');
+        }
+
+        function updateCharts() {
+            const county = document.getElementById('countySelect').value;
+            const specialty = document.getElementById('specialtySelect').value;
+            const provider = document.getElementById('providerSelect').value;
+
+            console.log(`Updated view for ${county}, ${specialty}, ${provider}`);
+
+            // Simulate new chart data (randomized for demonstration)
+            const randomData = () => Math.floor(Math.random() * (100 - 50 + 1)) + 50;
+            const meetsAdequacy = randomData() > 60; // Random condition for demo
+
+            metric1Chart.data.datasets[0].data = [randomData(), 100 - randomData()];
+            metric2Chart.data.datasets[0].data = [randomData()];
+            metric3Chart.data.datasets[0].data = [randomData(), randomData(), randomData()];
+
+            metric1Chart.update();
+            metric2Chart.update();
+            metric3Chart.update();
+
+            // Display network adequacy status
+            const adequacyStatus = document.getElementById('adequacyStatus');
+            const downloadBtn = document.getElementById('downloadBtn');
+
+            if (meetsAdequacy) {
+                adequacyStatus.textContent = "The provider meets the network adequacy requirements.";
+                adequacyStatus.style.color = '#4CAF50';
+                downloadBtn.style.display = 'block';
+            } else {
+                adequacyStatus.textContent = "The provider does not meet the network adequacy requirements. Reasons:";
+                adequacyStatus.style.color = '#F44336';
+
+                // Display specific reasons for non-compliance
+                adequacyStatus.textContent += " Insufficient provider count, non-compliance with time and distance, or inadequate demographic coverage.";
+                downloadBtn.style.display = 'none';
+            }
+        }
+
+        function showDownloadPopup() {
+            alert("Feature coming soon! The HSD Table download functionality will be available in future versions.");
+        }
+
+        // Initialize risk heatmap chart
+        const riskHeatmap = new Chart(document.getElementById('riskHeatmap'), {
+            type: 'bar',
+            data: {
+                labels: ['Los Angeles County', 'Cook County', 'Harris County'],
+                datasets: [{
+                    label: 'Risk Score',
+                    data: [70, 85, 60], // Example risk scores
+                    backgroundColor: function(context) {
+                        const value = context.dataset.data[context.dataIndex];
+                        return value > 80 ? '#F44336' : value > 60 ? '#FF9800' : '#4CAF50';
+                    }
+                }]
+            },
+            options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    text: 'Risk Heatmap'
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }]
+                }
+            }
+        });
+
+        // Initialize risk scoring chart
+        const riskScoringChart = new Chart(document.getElementById('riskScoringChart'), {
+            type: 'radar',
+            data: {
+                labels: ['Cardiology', 'Oncology', 'Pediatrics'],
+                datasets: [{
+                    label: 'Risk Score by Specialty',
+                    data: [75, 85, 65], // Example specialty risk scores
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)'
+                }]
+            },
+            options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    text: 'County-Specialty Risk Scoring'
+                }
+            }
+        });
+
+        function updateComplianceCharts() {
+            const county = document.getElementById('complianceCountySelect').value;
+            const specialty = document.getElementById('complianceSpecialtySelect').value;
+            const provider = document.getElementById('complianceProviderSelect').value;
+
+            console.log(`Updated compliance view for ${county}, ${specialty}, ${provider}`);
+
+            // Simulate new risk data for demo purposes
+            const randomData = () => Math.floor(Math.random() * (100 - 50 + 1)) + 50;
+
+            riskHeatmap.data.datasets[0].data = [randomData(), randomData(), randomData()];
+            riskScoringChart.data.datasets[0].data = [randomData(), randomData(), randomData()];
+
+            riskHeatmap.update();
+            riskScoringChart.update();
+        }
+    </script>
+</body>
+</html>
